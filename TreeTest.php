@@ -37,7 +37,7 @@ class TreeTest extends TestCase
     }
 
     /**
-     * Че-то делается
+     * Буферный вывод
      */
     private function getReturnResult(string $class, string $method, bool $isShowFile, array $params)
     {
