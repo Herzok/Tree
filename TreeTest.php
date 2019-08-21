@@ -8,7 +8,7 @@ class TreeTest extends TestCase
 {
     public function testShowFullTree()
     {
-    	$expected = "";
+    	$expected = "111111";
 		$tree = new Tree('tree', true);
     	ob_start();
         $tree->show();
