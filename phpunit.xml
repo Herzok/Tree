@@ -1,0 +1,12 @@
+<phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/latest/phpunit.xsd"
+        colors="true"
+>
+    <testsuites>
+        <testsuite name="Мой набор тестов">
+            <directory>./</directory>
+            <file>*Test.php</file>
+        </testsuite>
+    </testsuites>
+</phpunit>
