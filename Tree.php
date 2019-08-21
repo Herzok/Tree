@@ -7,8 +7,9 @@ class Tree
 
     /**
      * Tree constructor.
+     *
      * @param string $path
-     * @param bool $isShowFiles
+     * @param bool   $isShowFiles
      */
     public function __construct(string $path, bool $isShowFiles)
     {
@@ -18,20 +19,21 @@ class Tree
 
     public function show()
     {
-        if (is_dir($this->path)) {
+        if (!is_dir($this->path)) {
+            echo 'Директория не найдена';
+        } else {
             if (count(glob($this->path . '/*')) > 0) {
                 $this->printTree($this->path, []);
             } else {
                 echo 'Директория пуста';
             }
-        } else {
-            echo 'Директория не найдена';
         }
     }
 
     /**
      * Сканирование директории по текущему пути
-     * @param string $path
+     *
+     * @param  string $path
      * @return array|false
      */
     private function filterResultScanDir(string $path)
@@ -40,10 +42,13 @@ class Tree
         if ($this->isShowFiles === true) {
             $files = array_diff($scanResult, ['.', '..']);
         } else {
-            $files = array_filter($scanResult, function ($file) use ($path) {
-                return !in_array($file, ['.', '..'])
-                    && is_dir("$path/$file");
-            });
+            $files = array_filter(
+                $scanResult,
+                function ($file) use ($path) {
+                    return !in_array($file, ['.', '..'])
+                    && is_dir($path . "/" . $file);
+                }
+            );
         }
         $files = array_values($files);
         return $files;
@@ -51,15 +56,16 @@ class Tree
 
     /**
      * Вывод файлов и директорий
+     *
      * @param string $fullPath
      * @param string $file
-     * @param int $index
-     * @param int $lastIndex
-     * @param array $lastDirs
+     * @param int    $index
+     * @param int    $lastIndex
+     * @param array  $lastDirs
      */
     private function printFiles(string $fullPath, string $file, int $index, int $lastIndex, array $lastDirs)
-	{
-		$stringFile = '';
+    {
+        $stringFile = '';
         foreach ($lastDirs as $lastDir) {
             $stringFile .= ($lastDir === true ? "\t" : "│\t");
         }
@@ -79,8 +85,9 @@ class Tree
 
     /**
      * Проверка на последнюю директорию
-     * @param $index
-     * @param $lastIndex
+     *
+     * @param  $index
+     * @param  $lastIndex
      * @return mixed
      */
     private function isLastDir(int $index, int $lastIndex)
@@ -90,8 +97,9 @@ class Tree
 
     /**
      * Показ дерева каталогов
+     *
      * @param string $path
-     * @param array $lastDirs
+     * @param array  $lastDirs
      */
     public function printTree(string $path, array $lastDirs)
     {
