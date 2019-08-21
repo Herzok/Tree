@@ -7,6 +7,15 @@ require_once 'Tree.php';
 
 class TreeTest extends TestCase
 {
+    /**
+     * Создание ReflectionMethod
+     *
+     * @param  string $class
+     * @param  string $method
+     * @param  bool $isShowFile
+     * @return array
+     * @throws ReflectionException
+     */
     public function createReflectionMethod(string $class, string $method, bool $isShowFile)
     {
         $refMethod = new ReflectionMethod($class, $method);
@@ -15,6 +24,9 @@ class TreeTest extends TestCase
         return [$tree, $refMethod];
     }
 
+    /**
+     * Проверка выводимой структуры полного дерева
+     */
     public function testShowFullTree()
     {
         $expected = "├── README.md (2073 bytes)
@@ -39,6 +51,9 @@ class TreeTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    /**
+     * Проверка дерева каталогов
+     */
     public function testShowDirsTree()
     {
         $expected = "└── data
@@ -56,6 +71,11 @@ class TreeTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    /**
+     * Проверка написания последней директории
+     *
+     * @throws ReflectionException
+     */
     public function testPrintLastDir()
     {
         $resultCreateRefMethod = $this->createReflectionMethod('Tree', 'printFiles', false);
@@ -69,6 +89,11 @@ class TreeTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    /**
+     * Проверка написания не последней тиректории
+     *
+     * @throws ReflectionException
+     */
     public function testPrintDir()
     {
         $resultCreateRefMethod = $this->createReflectionMethod('Tree', 'printFiles', false);
@@ -82,6 +107,11 @@ class TreeTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    /**
+     * Проверка вывода размера файла
+     *
+     * @throws ReflectionException
+     */
     public function testSizePrintFile()
     {
         $resultCreateRefMethod = $this->createReflectionMethod('Tree', 'printFiles', true);
@@ -94,6 +124,12 @@ class TreeTest extends TestCase
         $expected = "├── README.md (2073 bytes)\n";
         $this->assertEquals($expected, $actual);
     }
+
+    /**
+     * Проверка вывода пустого файла
+     *
+     * @throws ReflectionException
+     */
     public function testEmptyPrintFile()
     {
         $resultCreateRefMethod = $this->createReflectionMethod('Tree', 'printFiles', true);
@@ -107,6 +143,9 @@ class TreeTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    /**
+     * Проверка вводимых параметров
+     */
     public function testPathIsShowFiles()
     {
         $tree = new Tree('tree', true);
@@ -114,6 +153,11 @@ class TreeTest extends TestCase
         $this->assertNotNull($tree->path);
     }
 
+    /**
+     * Проверка правильности результата метода isLastDir
+     *
+     * @throws ReflectionException
+     */
     public function testIsLastDir()
     {
         $resultCreateRefMethod = $this->createReflectionMethod('Tree', 'isLastDir', false);
@@ -123,6 +167,11 @@ class TreeTest extends TestCase
         $this->assertTrue($result);
     }
 
+    /**
+     * Проверка вывода не пустого результата метода filterResultScanDir
+     *
+     * @throws ReflectionException
+     */
     public function testResultScanDir()
     {
         $resultCreateRefMethod = $this->createReflectionMethod('Tree', 'filterResultScanDir', false);
