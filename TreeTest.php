@@ -16,12 +16,12 @@ class TreeTest extends TestCase
      * @return array
      * @throws ReflectionException
      */
-    private function createReflectionMethod(string $class, string $method, bool $isShowFile)
+    private function getObjAndMethod(string $method, bool $isShowFile)
     {
-        $refMethod = new ReflectionMethod($class, $method);
+        $refMethod = new ReflectionMethod('Tree', $method);
         $tree = new Tree('tree', $isShowFile);
         $refMethod->setAccessible(true);
-        return [$tree, $refMethod];
+        return ['tree' => $tree,'method' => $refMethod];
     }
 
     /**
@@ -39,13 +39,27 @@ class TreeTest extends TestCase
     /**
      * Буферный вывод.
      */
-    private function getReturnResult(string $class, string $method, bool $isShowFile, array $params)
+    private function getBufferResult(string $method, bool $isShowFile, array $params)
     {
-        $resultCreateRefMethod = $this->createReflectionMethod($class, $method, $isShowFile);
+        $resultObjAndMethod = $this->getObjAndMethod($method, $isShowFile);
         ob_start();
-        $resultCreateRefMethod [1]->invokeArgs($resultCreateRefMethod [0], $params);
-        $actual = ob_get_clean();
-        return $actual;
+        $resultObjAndMethod ['method']->invokeArgs($resultObjAndMethod ['tree'], $params);
+        return ob_get_clean();
+    }
+
+    /**
+     *  Возвращение результата выполнения метода
+     *
+     * @param string $method
+     * @param bool $isShowFile
+     * @param array $params
+     * @return mixed
+     * @throws ReflectionException
+     */
+    private function getSomeResult(string $method, bool $isShowFile, array $params)
+    {
+        $resultObjAndMethod = $this->getObjAndMethod($method, $isShowFile);
+        return $resultObjAndMethod ['method']->invokeArgs($resultObjAndMethod ['tree'], $params);
     }
 
 
@@ -54,10 +68,9 @@ class TreeTest extends TestCase
      *
      * @throws ReflectionException
      */
-    public function testIsLastDir()
+    public function testIsLastDirRes()
     {
-        $resultCreateRefMethod = $this->createReflectionMethod('Tree', 'isLastDir', false);
-        $result = $resultCreateRefMethod [1]->invokeArgs($resultCreateRefMethod [0], [1, 1]);
+        $result = $this->getSomeResult('isLastDir', false, [1,1]);
         $this->assertTrue($result);
     }
 
@@ -78,8 +91,7 @@ class TreeTest extends TestCase
      */
     public function testEmptyPrintFile()
     {
-        $actual = $this->getReturnResult(
-            'Tree',
+        $actual = $this->getBufferResult(
             'printFiles',
             true,
             ['tree/data/empty.txt', 'empty.txt', 0, 1, []]
@@ -96,8 +108,7 @@ class TreeTest extends TestCase
      */
     public function testPrefixesPrintFile(string $prefix, array $levelDirs)
     {
-        $actual = $this->getReturnResult(
-            'Tree',
+        $actual = $this->getBufferResult(
             'printFiles',
             true,
             ['tree/data/empty.txt', 'empty.txt', 0, 1, $levelDirs]
@@ -113,8 +124,7 @@ class TreeTest extends TestCase
      */
     public function testResultScanDir()
     {
-        $resultCreateRefMethod = $this->createReflectionMethod('Tree', 'filterResultScanDir', false);
-        $result = $resultCreateRefMethod [1]->invokeArgs($resultCreateRefMethod [0], ['tree']);
+        $result = $this->getSomeResult('filterResultScanDir', false, ['tree']);
         $this->assertNotNull($result);
     }
 
@@ -125,8 +135,7 @@ class TreeTest extends TestCase
      */
     public function testPrintLastDir()
     {
-        $actual = $this->getReturnResult(
-            'Tree',
+        $actual = $this->getBufferResult(
             'printFiles',
             false,
             ['tree', 'data', 0, 0, []]
@@ -142,8 +151,7 @@ class TreeTest extends TestCase
      */
     public function testPrintDir()
     {
-        $actual = $this->getReturnResult(
-            'Tree',
+        $actual = $this->getBufferResult(
             'printFiles',
             false,
             ['tree', 'data', 0, 1, []]
@@ -159,8 +167,7 @@ class TreeTest extends TestCase
      */
     public function testSizePrintFile()
     {
-        $actual = $this->getReturnResult(
-            'Tree',
+        $actual = $this->getBufferResult(
             'printFiles',
             true,
             ['tree/README.md', 'README.md', 0, 1, []]

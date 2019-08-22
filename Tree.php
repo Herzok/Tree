@@ -63,18 +63,18 @@ class Tree
      * @param int    $lastIndex
      * @param array  $lastDirs
      */
-    private function printFiles(array $params)
+    private function printFiles(string $fullPath, string $file, int $index, int $lastIndex, array $lastDirs)
     {
         $stringFile = '';
-        foreach ($params['lastDirs'] as $lastDir) {
+        foreach ($lastDirs as $lastDir) {
             $stringFile .= ($lastDir === true ? "\t" : "│\t");
         }
-        $stringFile .= ($this->isLastDir($params['i'], $params['lastIndex'])
+        $stringFile .= ($this->isLastDir($index, $lastIndex)
                 ? '└── '
-                : '├── ') . $params['file'];
-        if (!is_dir($params['path'])) {
-            if (filesize($params['path']) > 0) {
-                $stringFile .= ' (' . filesize($params['path']) . ' bytes)';
+                : '├── ') . $file;
+        if (!is_dir($fullPath)) {
+            if (filesize($fullPath) > 0) {
+                $stringFile .= ' (' . filesize($fullPath) . ' bytes)';
             } else {
                 $stringFile .= ' ( empty )';
             }
@@ -85,7 +85,7 @@ class Tree
     }
 
     /**
-     *Метод для написания дерева в файл
+     * Композиция метод для написания дерева в файл
      */
     public function printTreeToFile(string $stringFile)
     {
@@ -116,18 +116,7 @@ class Tree
         $lastIndex = count($files) - 1;
         foreach ($files as $i => $file) {
             $fullPath = $path . '/' . $file;
-            $this->printFiles(['path' => $fullPath,
-                'file' => $file,
-                'i' => $i,
-                'lastIndex' => $lastIndex,
-                'lastDirs' => $lastDirs
-            ]);
-            /*$this->printTreeToFile(['path' => $fullPath,
-                'file' => $file,
-                'i' => $i,
-                'lastIndex' => $lastIndex,
-                'lastDirs' => $lastDirs
-            ]);*/
+            $this->printFiles($fullPath, $file, $i, $lastIndex, $lastDirs);
             if (is_dir($fullPath)) {
                 $lastDir = $this->isLastDir($i, $lastIndex);
                 $newlastDirs = array_merge($lastDirs, [$lastDir]);
