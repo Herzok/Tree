@@ -2,6 +2,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/latest/phpunit.xsd"
         colors="true"
+        bootstrap = "bootstrap.php"
 >
     <testsuites>
         <testsuite name="Мой набор тестов">

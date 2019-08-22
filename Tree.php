@@ -4,6 +4,8 @@ class Tree
 {
     public $path;
     public $isShowFiles;
+    public $writer;
+    public $isPrintToFile;
 
     /**
      * Tree constructor.
@@ -11,14 +13,18 @@ class Tree
      * @param string $path
      * @param bool   $isShowFiles
      */
-    public function __construct(string $path, bool $isShowFiles)
+    /*public function __construct(string $path, bool $isShowFiles)
     {
         $this->path = $path;
         $this->isShowFiles = $isShowFiles;
-    }
+    }*/
 
-    public function show()
+    public function show(string $path, bool $isShowFiles, object $writer, bool $isPrintToFile)
     {
+        $this->path = $path;
+        $this->isShowFiles = $isShowFiles;
+        $this->writer = $writer;
+        $this->isPrintToFile = $isPrintToFile;
         if (!is_dir($this->path)) {
             echo 'Директория не найдена';
         } else {
@@ -65,31 +71,25 @@ class Tree
      */
     private function printFiles(string $fullPath, string $file, int $index, int $lastIndex, array $lastDirs)
     {
-        $stringFile = '';
+        $result = '';
         foreach ($lastDirs as $lastDir) {
-            $stringFile .= ($lastDir === true ? "\t" : "│\t");
+            $result .= ($lastDir === true ? "\t" : "│\t");
         }
-        $stringFile .= ($this->isLastDir($index, $lastIndex)
+        $result .= ($this->isLastDir($index, $lastIndex)
                 ? '└── '
                 : '├── ') . $file;
         if (!is_dir($fullPath)) {
             if (filesize($fullPath) > 0) {
-                $stringFile .= ' (' . filesize($fullPath) . ' bytes)';
+                $result .= ' (' . filesize($fullPath) . ' bytes)';
             } else {
-                $stringFile .= ' ( empty )';
+                $result .= ' ( empty )';
             }
         }
-        $stringFile .= "\n";
-        echo $stringFile;
-        $this->printTreeToFile($stringFile);
-    }
+        $result .= "\n";
+        ($this->isPrintToFile === true)
+            ? $this->writer->writeToFile($result)
+            : $this->writer->writeToWindow($result);
 
-    /**
-     * Композиция метод для написания дерева в файл
-     */
-    public function printTreeToFile(string $stringFile)
-    {
-        file_put_contents('tree.txt', $stringFile, FILE_APPEND);
     }
 
     /**

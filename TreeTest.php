@@ -3,7 +3,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-require_once 'Tree.php';
+require_once ('bootstrap.php');
 
 class TreeTest extends TestCase
 {
