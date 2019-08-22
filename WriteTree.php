@@ -1,12 +1,12 @@
 <?php
 class WriteTree
 {
-    public function writeToFile(string $result)
+    public function writeToFile(string $text)
     {
-        file_put_contents('tree.txt', $result, FILE_APPEND);
+        file_put_contents('tree.txt', $text, FILE_APPEND);
     }
-    public function writeToWindow(string $result)
+    public function writeToWindow(string $text)
     {
-        echo $result;
+        echo $text;
     }
 }
