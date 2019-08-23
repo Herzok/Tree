@@ -3,10 +3,19 @@
 
 use PHPUnit\Framework\TestCase;
 
-require_once ('bootstrap.php');
+require_once('bootstrap.php');
 
 class TreeTest extends TestCase
 {
+    private function getObjAndMethodWriter(string $method, bool $isShowFile)
+    {
+        $refMethod = new ReflectionMethod('Tree', $method);
+        $writer = new WriterStdout();
+        $tree = new Tree($writer,'tree.txt');
+        $tree->show('tree', $isShowFile);
+        $refMethod->setAccessible(true);
+        return ['tree' => $tree,'method' => $refMethod];
+    }
     /**
      * Создание ReflectionMethod
      *
@@ -19,12 +28,20 @@ class TreeTest extends TestCase
     private function getObjAndMethod(string $method, bool $isShowFile)
     {
         $refMethod = new ReflectionMethod('Tree', $method);
-        $writer = new WriterFile();
-        $tree = new Tree($writer,'tree', $isShowFile);
+        $writer = new WriterNull();
+        $tree = new Tree($writer,'tree.txt');
+        $tree->show('tree', $isShowFile);
         $refMethod->setAccessible(true);
         return ['tree' => $tree,'method' => $refMethod];
     }
 
+    private function getProperty(string $property, object $class)
+    {
+        $property = new ReflectionProperty(Tree::class, $property);
+        $property->setAccessible(true);
+        $result = $property->getValue($class);
+        return $result;
+    }
     /**
      * Возвращение отступов
      *
@@ -38,7 +55,7 @@ class TreeTest extends TestCase
     }
 
     /**
-     * Буферный вывод.
+     * Проверка буферизованного вывода
      */
     private function getBufferResult(string $method, bool $isShowFile, array $params)
     {
@@ -63,6 +80,38 @@ class TreeTest extends TestCase
         return $resultObjAndMethod ['method']->invokeArgs($resultObjAndMethod ['tree'], $params);
     }
 
+    /**
+     * Проверка переданного объекта
+     */
+    public function testIsNullWriter()
+    {
+        $writer = new WriterFile();
+        $tree = new Tree($writer,'treefiles.txt');
+        $property = $this->getProperty('writer', $tree);
+        $this->assertEquals($property, $writer);
+    }
+
+    /**
+     * Проверка переданного имени файла
+     */
+    public function testPropertyFileName()
+    {
+        $writer = new WriterNull();
+        $tree = new Tree($writer,'treefiles.txt');
+        $property = $this->getProperty('fileName', $tree);
+        $this->assertNotNull($property);
+    }
+
+    /**
+     * Проверка на существование файла
+     */
+    public function testIsThereFile()
+    {
+        $writer = new WriterFile();
+        $tree = new Tree($writer, 'tree.txt');
+        $tree->show('tree', true);
+        $this->assertFileExists('tree.txt');
+    }
 
     /**
      * Проверка правильности результата метода isLastDir
@@ -80,10 +129,13 @@ class TreeTest extends TestCase
      */
     public function testPathIsShowFiles()
     {
-        $writer = new WriterFile();
-        $tree = new Tree($writer,'tree', true);
-        $this->assertTrue($tree->isShowFiles);
-        $this->assertNotNull($tree->path);
+        $writer = new WriterNull();
+        $tree = new Tree($writer, 'tree.txt');
+        $tree->show('tree', true);
+        $path = $this->getProperty('path', $tree);
+        $isShowFiles = $this->getProperty('isShowFiles', $tree);
+        $this->assertTrue($path);
+        $this->assertNotNull($isShowFiles);
     }
 
     /**
@@ -190,9 +242,10 @@ class TreeTest extends TestCase
 \t│\t└── js
 \t└── src
 \t\t└── vue\n";
-        $tree = new Tree('tree', false);
+        $writer = new WriterStdout();
+        $tree = new Tree($writer, 'tree.txt');
         ob_start();
-        $tree->show();
+        $tree->show('tree', false);
         $actual = ob_get_contents();
         ob_end_clean();
         $this->assertEquals($expected, $actual);
@@ -217,9 +270,10 @@ class TreeTest extends TestCase
 \t\t├── vue
 \t\t│\t└── main.js (20 bytes)
 \t\t└── zzz.txt (21 bytes)\n";
-        $tree = new Tree('tree', true);
+        $writer = new WriterStdout();
+        $tree = new Tree($writer, 'tree.txt');
         ob_start();
-        $tree->show();
+        $tree->show('tree',true);
         $actual = ob_get_contents();
         ob_end_clean();
         $this->assertEquals($expected, $actual);

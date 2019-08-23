@@ -2,9 +2,10 @@
 
 class Tree
 {
-    public $path;
-    public $isShowFiles;
+    private $path;
+    private $isShowFiles;
     private $writer;
+    private $fileName;
 
     /**
      * Tree constructor.
@@ -12,15 +13,16 @@ class Tree
      * @param string $path
      * @param bool   $isShowFiles
      */
-    public function __construct(WriterInterface $writer, string $path, bool $isShowFiles)
+    public function __construct(WriterInterface $writer, string $fileName)
     {
+        $this->fileName = $fileName;
         $this->writer = $writer;
-        $this->path = $path;
-        $this->isShowFiles = $isShowFiles;
     }
 
-    public function show()
+    public function show(string $path, bool $isShowFiles)
     {
+        $this->path = $path;
+        $this->isShowFiles = $isShowFiles;
         if (!is_dir($this->path)) {
             echo 'Директория не найдена';
         } else {
@@ -82,15 +84,15 @@ class Tree
             }
         }
         $result .= "\n";
-        $this->write($result);
+        $this->print($result);
     }
 
     /**
      * @param string $text
      */
-    private function write(string $text)
+    private function print(string $text)
     {
-        $this->writer->printResult($text);
+        $this->writer->print($text, $this->fileName );
     }
 
     /**
