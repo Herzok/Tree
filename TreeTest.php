@@ -19,7 +19,7 @@ class TreeTest extends TestCase
     private function getObjAndMethod(string $method)
     {
         $refMethod = new ReflectionMethod('Tree', $method);
-        $writer = new WriterStdout();
+        $writer = new WriterBuffer();
         $tree = new Tree($writer);
         $refMethod->setAccessible(true);
         return ['tree' => $tree,'method' => $refMethod];
@@ -50,9 +50,8 @@ class TreeTest extends TestCase
     private function getBufferResult(string $method, array $params)
     {
         $resultObjAndMethod = $this->getObjAndMethod($method);
-        ob_start();
-        $resultObjAndMethod ['method']->invokeArgs($resultObjAndMethod ['tree'], $params);
-        return ob_get_clean();
+        $result = $resultObjAndMethod ['method']->invokeArgs($resultObjAndMethod ['tree'], $params);
+        return $result;
     }
 
     /**
