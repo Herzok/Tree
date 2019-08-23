@@ -1,23 +1,11 @@
 <?php
 require_once('bootstrap.php');
 
-//class Write
-//{
-//    public function writeToFile(string $result, string $fileName)
-//    {
-//        file_put_contents('tree.txt', $result, FILE_APPEND);
-//    }
-//    public function writeToWindow(string $result)
-//    {
-//        echo $result;
-//    }
-//}
-
 function write(string $path, bool $isShowFiles, bool $isPrintToFile)
 {
-    $writer = new WriteTree();
+    //$writer = new TreeWrite();
     $tree = new Tree();
-    $tree->show($path, $isShowFiles, $writer, $isPrintToFile);
+    $tree->show($path, $isShowFiles/*, $writer*/, $isPrintToFile);
 }
 $path = $argv[1] ? $argv[1] : null;
 $isShowFiles = (count($argv) > 2 && $argv[2] === '-f')

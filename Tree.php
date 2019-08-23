@@ -19,11 +19,11 @@ class Tree
         $this->isShowFiles = $isShowFiles;
     }*/
 
-    public function show(string $path, bool $isShowFiles, object $writer, bool $isPrintToFile)
+    public function show(string $path, bool $isShowFiles/*, object $writer*/, bool $isPrintToFile)
     {
         $this->path = $path;
         $this->isShowFiles = $isShowFiles;
-        $this->writer = $writer;
+        $this->writer = new TreeWrite();
         $this->isPrintToFile = $isPrintToFile;
         if (!is_dir($this->path)) {
             echo 'Директория не найдена';

@@ -1,5 +1,5 @@
 <?php
-class WriteTree
+class TreeWrite
 {
     public function writeToFile(string $text)
     {
