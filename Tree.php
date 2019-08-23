@@ -4,8 +4,7 @@ class Tree
 {
     public $path;
     public $isShowFiles;
-    public $writer;
-    public $isPrintToFile;
+    private $writer;
 
     /**
      * Tree constructor.
@@ -13,18 +12,15 @@ class Tree
      * @param string $path
      * @param bool   $isShowFiles
      */
-    /*public function __construct(string $path, bool $isShowFiles)
+    public function __construct(WriterInterface $writer, string $path, bool $isShowFiles)
     {
+        $this->writer = $writer;
         $this->path = $path;
         $this->isShowFiles = $isShowFiles;
-    }*/
+    }
 
-    public function show(string $path, bool $isShowFiles/*, object $writer*/, bool $isPrintToFile)
+    public function show()
     {
-        $this->path = $path;
-        $this->isShowFiles = $isShowFiles;
-        $this->writer = new TreeWrite();
-        $this->isPrintToFile = $isPrintToFile;
         if (!is_dir($this->path)) {
             echo 'Директория не найдена';
         } else {
@@ -86,10 +82,15 @@ class Tree
             }
         }
         $result .= "\n";
-        ($this->isPrintToFile === true)
-            ? $this->writer->writeToFile($result)
-            : $this->writer->writeToWindow($result);
+        $this->write($result);
+    }
 
+    /**
+     * @param string $text
+     */
+    private function write(string $text)
+    {
+        $this->writer->printResult($text);
     }
 
     /**
@@ -110,7 +111,7 @@ class Tree
      * @param string $path
      * @param array  $lastDirs
      */
-    public function printTree(string $path, array $lastDirs)
+    private function printTree(string $path, array $lastDirs)
     {
         $files = $this->filterResultScanDir($path);
         $lastIndex = count($files) - 1;

@@ -19,7 +19,8 @@ class TreeTest extends TestCase
     private function getObjAndMethod(string $method, bool $isShowFile)
     {
         $refMethod = new ReflectionMethod('Tree', $method);
-        $tree = new Tree('tree', $isShowFile);
+        $writer = new WriterFile();
+        $tree = new Tree($writer,'tree', $isShowFile);
         $refMethod->setAccessible(true);
         return ['tree' => $tree,'method' => $refMethod];
     }
@@ -79,7 +80,8 @@ class TreeTest extends TestCase
      */
     public function testPathIsShowFiles()
     {
-        $tree = new Tree('tree', true);
+        $writer = new WriterFile();
+        $tree = new Tree($writer,'tree', true);
         $this->assertTrue($tree->isShowFiles);
         $this->assertNotNull($tree->path);
     }
