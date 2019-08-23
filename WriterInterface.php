@@ -1,5 +1,5 @@
 <?php
 interface WriterInterface
 {
-    public function print(string $text, string $fileName);
+    public function print(string $text);
 }

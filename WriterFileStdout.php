@@ -1,9 +1,9 @@
 <?php
-Class WriterFileStdout implements WriterInterface
+Class WriterFileStdout extends WriterFile
 {
-    public function print(string $text, string $fileName)
+    public function print(string $text)
     {
+        parent::print($text);
         echo $text;
-        file_put_contents($fileName, $text, FILE_APPEND);
     }
 }

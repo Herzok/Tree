@@ -1,8 +1,15 @@
 <?php
 class WriterFile implements WriterInterface
 {
-    public function print(string $text, string $fileName)
+    private $fileName;
+
+    public function __construct(string $fileName = 'tree.txt')
     {
-        file_put_contents('tree.txt', $text, FILE_APPEND);
+        $this->fileName = $fileName;
+    }
+
+    public function print(string $text)
+    {
+        file_put_contents($this->fileName, $text, FILE_APPEND);
     }
 }

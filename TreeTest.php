@@ -7,15 +7,6 @@ require_once('bootstrap.php');
 
 class TreeTest extends TestCase
 {
-    private function getObjAndMethodWriter(string $method, bool $isShowFile)
-    {
-        $refMethod = new ReflectionMethod('Tree', $method);
-        $writer = new WriterStdout();
-        $tree = new Tree($writer,'tree.txt');
-        $tree->show('tree', $isShowFile);
-        $refMethod->setAccessible(true);
-        return ['tree' => $tree,'method' => $refMethod];
-    }
     /**
      * Создание ReflectionMethod
      *
@@ -25,21 +16,20 @@ class TreeTest extends TestCase
      * @return array
      * @throws ReflectionException
      */
-    private function getObjAndMethod(string $method, bool $isShowFile)
+    private function getObjAndMethod(string $method)
     {
         $refMethod = new ReflectionMethod('Tree', $method);
-        $writer = new WriterNull();
-        $tree = new Tree($writer,'tree.txt');
-        $tree->show('tree', $isShowFile);
+        $writer = new WriterStdout();
+        $tree = new Tree($writer);
         $refMethod->setAccessible(true);
         return ['tree' => $tree,'method' => $refMethod];
     }
 
-    private function getProperty(string $property, object $class)
+    private function getProperty(string $property, object $obj)
     {
-        $property = new ReflectionProperty(Tree::class, $property);
+        $property = new ReflectionProperty(get_class($obj), $property);
         $property->setAccessible(true);
-        $result = $property->getValue($class);
+        $result = $property->getValue($obj);
         return $result;
     }
     /**
@@ -57,9 +47,9 @@ class TreeTest extends TestCase
     /**
      * Проверка буферизованного вывода
      */
-    private function getBufferResult(string $method, bool $isShowFile, array $params)
+    private function getBufferResult(string $method, array $params)
     {
-        $resultObjAndMethod = $this->getObjAndMethod($method, $isShowFile);
+        $resultObjAndMethod = $this->getObjAndMethod($method);
         ob_start();
         $resultObjAndMethod ['method']->invokeArgs($resultObjAndMethod ['tree'], $params);
         return ob_get_clean();
@@ -86,20 +76,9 @@ class TreeTest extends TestCase
     public function testIsNullWriter()
     {
         $writer = new WriterFile();
-        $tree = new Tree($writer,'treefiles.txt');
+        $tree = new Tree($writer);
         $property = $this->getProperty('writer', $tree);
         $this->assertEquals($property, $writer);
-    }
-
-    /**
-     * Проверка переданного имени файла
-     */
-    public function testPropertyFileName()
-    {
-        $writer = new WriterNull();
-        $tree = new Tree($writer,'treefiles.txt');
-        $property = $this->getProperty('fileName', $tree);
-        $this->assertNotNull($property);
     }
 
     /**
@@ -108,7 +87,7 @@ class TreeTest extends TestCase
     public function testIsThereFile()
     {
         $writer = new WriterFile();
-        $tree = new Tree($writer, 'tree.txt');
+        $tree = new Tree($writer);
         $tree->show('tree', true);
         $this->assertFileExists('tree.txt');
     }
@@ -130,12 +109,12 @@ class TreeTest extends TestCase
     public function testPathIsShowFiles()
     {
         $writer = new WriterNull();
-        $tree = new Tree($writer, 'tree.txt');
+        $tree = new Tree($writer);
         $tree->show('tree', true);
         $path = $this->getProperty('path', $tree);
         $isShowFiles = $this->getProperty('isShowFiles', $tree);
-        $this->assertTrue($path);
-        $this->assertNotNull($isShowFiles);
+        $this->assertEquals($path, 'tree');
+        $this->assertEquals($isShowFiles, true);
     }
 
     /**
@@ -147,7 +126,6 @@ class TreeTest extends TestCase
     {
         $actual = $this->getBufferResult(
             'printFiles',
-            true,
             ['tree/data/empty.txt', 'empty.txt', 0, 1, []]
         );
         $expected = "├── empty.txt ( empty )\n";
@@ -164,7 +142,6 @@ class TreeTest extends TestCase
     {
         $actual = $this->getBufferResult(
             'printFiles',
-            true,
             ['tree/data/empty.txt', 'empty.txt', 0, 1, $levelDirs]
         );
         $expected = $prefix;
@@ -191,7 +168,6 @@ class TreeTest extends TestCase
     {
         $actual = $this->getBufferResult(
             'printFiles',
-            false,
             ['tree', 'data', 0, 0, []]
         );
         $expected = "└── data\n";
@@ -207,7 +183,6 @@ class TreeTest extends TestCase
     {
         $actual = $this->getBufferResult(
             'printFiles',
-            false,
             ['tree', 'data', 0, 1, []]
         );
         $expected = "├── data\n";
@@ -223,7 +198,6 @@ class TreeTest extends TestCase
     {
         $actual = $this->getBufferResult(
             'printFiles',
-            true,
             ['tree/README.md', 'README.md', 0, 1, []]
         );
         $expected = "├── README.md (2073 bytes)\n";

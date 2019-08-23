@@ -13,9 +13,8 @@ class Tree
      * @param string $path
      * @param bool   $isShowFiles
      */
-    public function __construct(WriterInterface $writer, string $fileName)
+    public function __construct(WriterInterface $writer)
     {
-        $this->fileName = $fileName;
         $this->writer = $writer;
     }
 
